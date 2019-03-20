@@ -1,4 +1,4 @@
-import spytIO
+from InputOutput.pagailleIO import saveEdf,openImage,openSeq
 import glob
 import os
 import sys
@@ -12,12 +12,12 @@ from scipy.ndimage.filters import gaussian_filter
 from math import pi as pi
 from math import floor as floor
 
-import frankoChellappa as fc
-import spytlabQT as qt
-import corrections
+from NoiseTracking.OpticalFlow import frankoChellappa as fc
+#import spytlabQT as qt
+#import corrections
 
 import numpy as np
-import fastTomoExperiment as esrfTomo
+from Tomography.FastTomo import fastTomoExperiment as esrfTomo
 
 
 def derivativesByOpticalflow(intensityImage,derivative,alpha=0,sig_scale=0):
@@ -174,10 +174,14 @@ if __name__ == "__main__":
 
    # result = processOneProjection(Is, Ir)
 
-    IrNames=glob.glob('/Users/embrun/Desktop/testSpecklePotiers/radio speckle/testFlat/ref/*.tiff')
-    IsNames= glob.glob('/Users/embrun/Desktop/testSpecklePotiers/radio speckle/testFlat/sample/*.tiff')
-    Ir=spytIO.openSeq(IrNames)
-    Is= spytIO.openSeq(IsNames)
+    IrNames=glob.glob('Z:/speckle2/quenot/Test_id17_fev2018_fils_2D/ref/*.edf')
+    print(IrNames)
+    IrNames.sort()
+    IsNames= glob.glob('Z:/speckle2/quenot/Test_id17_fev2018_fils_2D/sample/*.edf')
+    IsNames.sort()
+    Is=openSeq(IsNames)
+    Ir=openSeq(IrNames)
+    print(IsNames)
     result = processProjectionSet(Is, Ir)
 
     dx = result['dx']
@@ -186,10 +190,10 @@ if __name__ == "__main__":
     phi2 = result['phi2']
     phi3 = result['phi3']
     gradientNorm=result['gradientNorm']
-    spytIO.saveEdf(dx, 'output/dxPython2.edf')
-    spytIO.saveEdf(dy.real, 'output/dy.edf')
-    spytIO.saveEdf(phi.real, 'output/phi.edf')
-    spytIO.saveEdf(phi2.real, 'output/phiLarkinson.edf')
-    spytIO.saveEdf(phi3.real, 'output/phiKottler.edf')
-    spytIO.saveEdf(gradientNorm, 'output/gradientNorm.edf')
-    spytIO.saveTiff16bit(gradientNorm, 'output/gradientNorm.tif')
+    saveEdf(dx, 'C:/Users/quenot/Desktop/outputOpticalFlow/dx.edf')
+    saveEdf(dy.real, 'C:/Users/quenot/Desktop/outputOpticalFlow/dy.edf')
+    saveEdf(phi.real, 'C:/Users/quenot/Desktop/outputOpticalFlow//phi.edf')
+    saveEdf(phi2.real, 'C:/Users/quenot/Desktop/outputOpticalFlow//phikottler.edf')
+    saveEdf(phi3.real, 'C:/Users/quenot/Desktop/outputOpticalFlow/phiLarkin.edf')
+    saveEdf(gradientNorm, 'C:/Users/quenot/Desktop/outputOpticalFlow/gradient.edf')
+

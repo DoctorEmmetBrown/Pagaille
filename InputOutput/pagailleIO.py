@@ -1,15 +1,11 @@
 
-#import EdfFile as edf
 import fabio
 import fabio.edfimage as edf
 import fabio.tifimage as tif
 #import edfimage
-from PIL import Image
+
+#from PIL import Image
 import numpy as np
-import scipy
-from scipy.misc import imsave as imsave
-import glob
-import skimage.io
 
 
 
@@ -84,14 +80,14 @@ def save3D_Edf(data,filename):
 
 
 
-def savePNG(data,filename,min=0,max=0):
-    if min == max:
-        min=np.amin(data)
-        max= np.amax(data)
-    data16bit=data-min/(max-min)
-    data16bit=np.asarray(data16bit,dtype=np.uint16)
+#def savePNG(data,filename,min=0,max=0):
+    #if min == max:
+    #    min=np.amin(data)
+    #    max= np.amax(data)
+    #data16bit=data-min/(max-min)
+    #data16bit=np.asarray(data16bit,dtype=np.uint16)
 
-    scipy.misc.imsave(filename,data16bit)
+    #scipy.misc.imsave(filename,data16bit)
 
 
 

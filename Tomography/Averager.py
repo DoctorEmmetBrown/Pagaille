@@ -1,6 +1,6 @@
 import numpy as np
 #from EdfFile import EdfFile as edfFile
-from spytIO import openImage,saveEdf
+from InputOutput.pagailleIO import openImage,saveEdf
 
 import math
 

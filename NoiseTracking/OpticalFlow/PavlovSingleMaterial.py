@@ -330,9 +330,9 @@ def testOneImage():
     numSlice='1318.edf'
 
     # Reading data
-    Ir = openImage('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf')
-    Is = openImage('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
-    df=openImage('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf')
+    Ir = openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf')
+    Is = openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
+    df=openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf')
 
     Ir = np.asarray(Ir-df, np.float32)
     Is = np.asarray(Is-df, np.float32)

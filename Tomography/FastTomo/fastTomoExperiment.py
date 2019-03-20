@@ -1,9 +1,9 @@
 import os
 import glob
 from xml.dom import minidom
-import Averager
-import EdfFile as edf
-import CenterOfRotation
+from Tomography import Averager
+import fabio.edfimage as edf
+#import Tomography import CenterOfRotation
 import numpy as np
 
 

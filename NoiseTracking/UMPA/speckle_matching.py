@@ -66,7 +66,7 @@ def match_speckles(Isample, Iref, Nw, step=1, max_shift=4, df=True):
 
     # Loop through all positions
     for xi, i in enumerate(ROIy):
-        print 'line %d, %d/%d' % (i, xi, sh[0])
+
         for xj, j in enumerate(ROIx):
             # Define local values of L1, L2, ...
             t1 = L1[i, j]
@@ -274,8 +274,8 @@ if __name__ == "__main__":
 
         # Evaluate if aliasing could be a problem
         if min(sh)/np.sqrt(2.) < z*l:
-            print "Warning: z > N/(sqrt(2)*lamda) = %.6g: this calculation could fail." % (min(sh)/(l*np.sqrt(2.)))
-            print "(consider padding your array, or try a far field method)"  
+            print("Warning: z > N/(sqrt(2)*lamda) = %.6g: this calculation could fail." % (min(sh)/(l*np.sqrt(2.))))
+            print("(consider padding your array, or try a far field method)" )
 
         q2 = np.sum((np.fft.ifftshift(np.indices(sh).astype(float) - np.reshape(np.array(sh)//2,(len(sh),) + len(sh)*(1,)), range(1,len(sh)+1)) * np.array([1./sh[0], 1./sh[1]]).reshape((2,1,1)))**2, axis=0)
 
@@ -312,7 +312,7 @@ if __name__ == "__main__":
         imsave('measurments'+texti+'.png',array)
 
 
-    print "reference saved"
+    print("reference saved")
 
 
 
@@ -329,10 +329,10 @@ if __name__ == "__main__":
     imsave('transmissionReference.tif',transmission)
 
     dx=result['dx']
-    print dx
+    print(dx)
     dx=255*(dx-dx.min())/(dx.max()-dx.min())
     dx=dx.astype(np.int8)
-    print dx
+    print(dx)
     imsave('dxReference.tif',dx)
 
     dy=result['dy']
