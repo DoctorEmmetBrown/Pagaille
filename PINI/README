@@ -1,0 +1,22 @@
+Needed Python3.6+ Packages:
+
+PyQt5
+sys
+os
+numpy
+SimpleITK
+pyqtgraph
+time
+copy
+scipy
+nibabel
+skimage
+vtk
+matplotlib
+pIL
+itertools
+math
+random
+pydicom
+pickle
+struct
