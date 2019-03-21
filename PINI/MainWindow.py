@@ -312,51 +312,6 @@ class MyMainWindow(qt.QMainWindow) :
         density_Action.triggered.connect(self.mainWidget.study_density_GUI)
         StudyMenu.addAction(density_Action)
 
-        macroMenu = menubar.addMenu('&Macros')
-
-
-
-        RegMenu = macroMenu.addMenu('&CHU Registration Analysis')
-        regStartAction = qt.QAction('&Start Registration', self)
-        regStartAction.triggered.connect( self.mainWidget.macro2_GUI )
-        RegMenu.addAction(regStartAction)
-
-        regLoadAction = qt.QAction('&Load Segmentation', self)
-        regLoadAction.triggered.connect( self.mainWidget.macro2_loadGUI )
-        RegMenu.addAction(regLoadAction)
-
-
-
-        macro3_Action = qt.QAction('&CHU Volume Adipose Tissue', self)
-        macro3_Action.setStatusTip('CHU Heart Segmentation')
-        macro3_Action.triggered.connect(self.mainWidget.macro3_GUI)
-        macroMenu.addAction(macro3_Action)
-
-        macro5_Action = qt.QAction('&CHU Lung Blood Volume', self)
-        macro5_Action.setStatusTip('CHU Lung Blood Volume')
-        macro5_Action.triggered.connect( self.mainWidget.macro5_GUI)
-        macroMenu.addAction(macro5_Action)
-        
-        
-        macro6_Action = qt.QAction('&GIN Generate Brain Mesh', self)
-        macro6_Action.setStatusTip('CHU Lung Blood Volume')
-        macro6_Action.triggered.connect( self.mainWidget.macro6_GUI)
-        macroMenu.addAction(macro6_Action)
-        
-
-#        macro4_Action = qt.QAction('&Bronchi Study', self)
-#        macro4_Action.setStatusTip('Bronchi Study')
-#        qt.QObject.connect(macro4_Action, qt.SIGNAL("triggered()"), self.mainWidget.macro4_GUI)
-#        macroMenu.addAction(macro4_Action)
-
-        macro1_Action = qt.QAction('&Image Analysis Diffusion', self)
-        macro1_Action.setStatusTip('Concentration Analysis Diffusion Study')
-        macro1_Action.triggered.connect(self.mainWidget.macro1_GUI)
-        macroMenu.addAction(macro1_Action)
-
-
-
-
 if __name__ == "__main__":
 
 

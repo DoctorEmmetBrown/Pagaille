@@ -11,7 +11,7 @@ class CustomToolBar(qt.QToolBar):
         qt.QToolBar.__init__(self, parent)
         self.setIconSize(qt.QSize(25, 25))
 
-        self.zoomAutoAction = qt.QAction(qt.QIcon('Icones/autozoom.png'), '&Zoom', self)
+        self.zoomAutoAction = qt.QAction(qt.QIcon('Icones/autozoom.png'), '&Reset Zoom', self)
         self.zoomAutoAction.setStatusTip('Fit window')
         self.zoomAutoAction.setCheckable(False)
         self.zoomAutoAction.setChecked(False)
@@ -64,7 +64,7 @@ class CustomToolBar(qt.QToolBar):
         colorMapDefault = "GrayLevel", range(256), range(256), range(256)
         self.colormapList.append(colorMapDefault)
         self.colorChoice.addItems([self.colormapList[0][0]])
-        self.addColorMap('Jet', './jet_color.txt')
+        self.addColorMap('Jet', './Data/jet_color.txt')
 
         self.addAction(self.zoomAutoAction)
         self.addSeparator()
