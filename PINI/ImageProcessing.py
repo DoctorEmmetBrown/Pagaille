@@ -108,107 +108,8 @@ def BackSigmoid(Image, Alpha, Beta):
     Image[Image <= 0.0593] = 0.0593
     Image[Image >= 224.60] = 224.60
 
-
     Image = -Alpha * (np.log((224.61 / Image) - 1.0)) + Beta
     return Image
-
-
-def compute_sVair(ImageFix, ImageMov, Trachea, Distance):
-    Trachea[Trachea == 1] = -1
-    Trachea += 1
-    ImageFix *= Trachea
-    ImageMov *= Trachea
-
-    # Grad = gradGauss(ImageFix,0.2)
-
-    # ImageFix = BackSigmoid(ImageFix,-100,-824)
-    # ImageMov = BackSigmoid(ImageMov,-100,-824)
-    ImageMov[ImageMov == ImageMov[0, 0, 0]] = -2000
-    ImageFix[ImageFix == ImageFix[0, 0, 0]] = -2000
-
-    # ImageMov = np.copy(grey_dilation(ImageMov, size=(40,40,40)))
-    # ImageMov2[ImageMov > 2.0] = 0.0
-    # ImageMov = ImageMov2 + ImageMov
-
-    # ImageMov = gaussian_filter(ImageMov,5)
-
-    # ImageMov = np.nan_to_num(ImageMov)
-    # ImageMov[ImageMov >= 0] = -0.1
-    # ImageMov[ImageMov <= -1000] = -999.9
-
-    # ImageFix = np.nan_to_num(ImageFix)
-    # ImageFix[ImageFix >= 0] = -0.1
-    # ImageFix[ImageFix <= -1000] = -999.9
-
-    # sVair = 1000.0*((ImageMov-ImageFix)/(ImageFix*(ImageMov+1000.0)))
-
-
-    ImageMov = median(ImageMov, 1,False)
-    ImageFix = median(ImageFix, 1, False)
-
-    # ImageMov = grey_dilation(ImageMov, size=(5,5,5))
-
-    deltaHU = (ImageMov - ImageFix)
-    deltaHU[ImageFix < -1100] = 0.0
-    deltaHU[ImageFix > 200] = 0.0
-    #deltaHU[deltaHU < -100.0] = 0
-    #deltaHU[deltaHU > 500.0] = 0
-
-    sVair = -1000.0 * (deltaHU) / (ImageFix * (ImageMov + 1000.0))
-
-    sVair[ImageFix < -1100] = 0.0
-    sVair[ImageFix > 200] = 0.0
-    #sVair[sVair < -1.0] = 0.0
-    #sVair[sVair > 5.0] = 0.0
-
-    Distance[ImageFix < -1100] = 0.0
-    Distance[ImageFix > 200] = 0.0
-    #Distance[deltaHU < -500.0] = 0.0
-    #Distance[deltaHU > 500.0] = 0.0
-
-    Cluster = np.zeros((ImageFix.shape[0], ImageFix.shape[1], ImageFix.shape[2]))
-
-    Cluster[(ImageMov < -900) * (ImageFix < -900)] = 5
-    Cluster[(ImageMov > -900) * (ImageMov < -500) * (ImageFix < -900)] = 1
-    Cluster[(ImageMov > -500) * (ImageFix < -900)] = 6
-
-    Cluster[(ImageMov < -900) * (ImageFix < -500) * (ImageFix > -900)] = 7
-    Cluster[(ImageMov > -900) * (ImageMov < -500) * (ImageFix < -500) * (ImageFix > -900)] = 1
-    Cluster[(ImageMov > -500) * (ImageFix < -500) * (ImageFix > -900)] = 9
-
-    Cluster[(ImageMov < -900) * (ImageFix > -500)] = 3
-    Cluster[(ImageMov > -900) * (ImageMov < -500) * (ImageFix > -500)] = 2
-    Cluster[(ImageMov > -500) * (ImageFix > -500)] = 8
-
-
-    #Cluster[(ImageMov > -832) * (ImageFix > -926)] = 2
-    #Cluster[(ImageMov > -832) * (ImageFix < -926)] = 1
-    #Cluster[(ImageMov < -832) * (ImageFix > -926)] = 3
-    #Cluster[(ImageMov < -832) * (ImageFix < -926)] = 4
-    #Cluster[(ImageMov > -530)] = 1
-    #Cluster[(ImageFix > -530) ] = 5
-
-    Cluster[ImageFix < -1100] = 0.0
-    Cluster[ImageFix > 200] = 0.0
-
-    Cluster[0, 0, 0] = 1
-    Cluster[0, 0, 1] = 2
-    Cluster[0, 1, 0] = 3
-    Cluster[0, 1, 1] = 4
-    Cluster[1, 0, 0] = 5
-    Cluster[1, 0, 1] = 6
-    Cluster[1, 1, 0] = 7
-    Cluster[1, 1, 1] = 8
-    Cluster[0, 0, 2] = 9
-
-    # Distance -=  ((Grad/np.max(Grad))*np.max(Distance)*0.3)
-    # sVair -= ((Grad/np.max(Grad))*np.max(sVair)*0.3)
-    # deltaHU -= ((Grad/np.max(Grad))*np.max(deltaHU)*0.3)
-    # ImageMov -= ((Grad/np.max(Grad))*np.max(ImageMov)*0.3)
-    # ImageFix -= ((Grad/np.max(Grad))*np.max(ImageFix)*0.3)
-
-    return [deltaHU, sVair, Distance, Cluster, ImageMov, ImageFix]
-
 
 def mip(inputDataToSeg, mip, direction, thickness):
     if direction == 'x':
@@ -798,124 +699,6 @@ def ComputeMaskLocalVolumeDensity(mask, ws, ov):
         c = np.nan_to_num(c)
 
     return c
-
-
-def ComputeMaskLocalNumberDensity(mask, ws, ov):
-    pass
-
-
-def ComputeMaskLocalSurfaceDensity(mask, ws, ov):
-    pass
-
-
-def ComputeDensityChange(hpImage, lpImage, ws, ov):
-    SizeZVol = hpImage.shape[0]
-    SizeXVol = hpImage.shape[1]
-    SizeYVol = hpImage.shape[2]
-
-    hpImage = (254.0) / (1.0 + np.exp(-(hpImage - 200.0) / -100.0)) + 2.0
-    lpImage = (254.0) / (1.0 + np.exp(-(lpImage - 200.0) / -100.0)) + 2.0
-
-    BlocSpeed = int((1 - ov) * ws)
-    if BlocSpeed == 0:
-        print("The overlap ration is to big the bloc matching speed is set to 1 pixel")
-        BlocSpeed = 1
-
-    densityMap = np.zeros((SizeZVol, SizeXVol, SizeYVol))
-    iterationMap = np.zeros((SizeZVol, SizeXVol, SizeYVol))
-
-    'Ready For Loop'
-
-    for xRef in np.arange(0, SizeXVol - 1, BlocSpeed):
-        for yRef in np.arange(0, SizeYVol - 1, BlocSpeed):
-            for zRef in np.arange(0, SizeZVol - 1, BlocSpeed):
-
-                xMinRef = xRef - int(ws / 2)
-                yMinRef = yRef - int(ws / 2)
-                zMinRef = zRef - int(ws / 2)
-
-                xMaxRef = xRef + int(ws / 2)
-                yMaxRef = yRef + int(ws / 2)
-                zMaxRef = zRef + int(ws / 2)
-
-                if xMinRef < 0:
-                    xMinRef = 0
-                if yMinRef < 0:
-                    yMinRef = 0
-                if zMinRef < 0:
-                    zMinRef = 0
-
-                if xMaxRef >= SizeXVol:
-                    xMaxRef = SizeXVol - 1
-                if yMaxRef >= SizeYVol:
-                    yMaxRef = SizeYVol - 1
-                if zMaxRef >= SizeZVol:
-                    zMaxRef = SizeZVol - 1
-
-                BlocRefHP = hpImage[zMinRef:zMaxRef, xMinRef:xMaxRef, yMinRef:yMaxRef] + 1.0
-                BlocRefLP = lpImage[zMinRef:zMaxRef, xMinRef:xMaxRef, yMinRef:yMaxRef] + 1.0
-                BlocRef = (BlocRefLP - BlocRefHP)
-
-                densityMap[zMinRef:zMaxRef, xMinRef:xMaxRef, yMinRef:yMaxRef] += stats.nanmedian(BlocRef, axis=None)
-                iterationMap[zMinRef:zMaxRef, xMinRef:xMaxRef, yMinRef:yMaxRef] += 1
-
-    with np.errstate(divide='ignore', invalid='ignore'):
-        c = np.true_divide(densityMap, iterationMap)
-        c[c == np.inf] = 0
-        c = np.nan_to_num(c)
-
-    return c
-
-
-def computeVentilationMap(Im1, OverlapRatio, SizeBloc, startingImage, time_step):
-    SizeZVol = Im1.shape[0]
-    SizeXVol = Im1.shape[1]
-    SizeYVol = Im1.shape[2]
-
-    BlocSpeed = int((1 - OverlapRatio) * SizeBloc)
-    if BlocSpeed == 0:
-        print("The overlap ration is to big the bloc matching speed is set to 1 pixel")
-        BlocSpeed = 1
-
-    ventilationMap = np.zeros((1, SizeXVol, SizeYVol))
-    IterationMap = np.zeros((1, SizeXVol, SizeYVol))
-    t_array = np.arange(0, SizeZVol * time_step, time_step)
-
-    for xRef in np.arange(0, SizeXVol - 1, BlocSpeed):
-        for yRef in np.arange(0, SizeYVol - 1, BlocSpeed):
-            xMinRef = xRef - int(SizeBloc / 2)
-            yMinRef = yRef - int(SizeBloc / 2)
-
-            xMaxRef = xRef + int(SizeBloc / 2)
-            yMaxRef = yRef + int(SizeBloc / 2)
-
-            if xMinRef < 0:
-                xMinRef = 0
-            if yMinRef < 0:
-                yMinRef = 0
-
-            if xMaxRef >= SizeXVol:
-                xMaxRef = SizeXVol - 1
-            if yMaxRef >= SizeYVol:
-                yMaxRef = SizeYVol - 1
-
-            BlocRef = Im1[:, xMinRef:xMaxRef, yMinRef:yMaxRef]
-
-            c_array = np.array(np.median(np.median(BlocRef, axis=1), axis=1))
-            if np.median(c_array) != 0:
-                try:
-                    popt, pcov = curve_fit(func, t_array, c_array)
-                    if not np.isnan(popt[1]):
-                        ventilationMap[:, xMinRef:xMaxRef, yMinRef:yMaxRef] += popt[1]
-                        IterationMap[:, xMinRef:xMaxRef, yMinRef:yMaxRef] += 1
-
-                except:
-                    pass
-
-    ventilationMap = np.nan_to_num(ventilationMap / IterationMap)
-    ventilationMap[ventilationMap > 5.0] = 5.0
-    ventilationMap[ventilationMap < 0] = 0
-    return ventilationMap
 
 
 def equalize(image, nzone, zones):
@@ -1644,75 +1427,6 @@ def returnZonesForEqualize(zones, data):
     return zones_in
 
 
-def saveImageAsTxt(I1, I2, I3, I4, I5, I6, filenames, binXls):
-    sizeZ = I1.shape[0]
-    sizeX = I2.shape[1]
-    sizeY = I3.shape[2]
-
-    with open(filenames[0], 'w'):
-        pass
-    with open(filenames[1], 'w'):
-        pass
-    with open(filenames[2], 'w'):
-        pass
-    with open(filenames[3], 'w'):
-        pass
-    with open(filenames[4], 'w'):
-        pass
-    with open(filenames[5], 'w'):
-        pass
-    with open(filenames[6], 'w'):
-        pass
-    with open(filenames[7], 'w'):
-        pass
-    with open(filenames[8], 'w'):
-        pass
-
-    data_to_save1 = np.empty((10000000, 1))
-    data_to_save2 = np.empty((10000000, 1))
-    data_to_save3 = np.empty((10000000, 1))
-    data_to_save4 = np.empty((10000000, 1))
-    data_to_save5 = np.empty((10000000, 1))
-    data_to_save6 = np.empty((10000000, 1))
-    data_to_save7 = np.empty((10000000, 1))
-    data_to_save8 = np.empty((10000000, 1))
-    data_to_save9 = np.empty((10000000, 1))
-
-    index = 0
-
-    for z in range(0, sizeZ, binXls):
-        for x in range(0, sizeX, binXls):
-            for y in range(0, sizeY, binXls):
-                if I1[z, x, y] != -2000.0:
-                    I1px = I1[z, x, y]
-                    I2px = I2[z, x, y]
-                    I3px = I3[z, x, y]
-                    I4px = I4[z, x, y]
-                    I5px = I5[z, x, y]
-                    I6px = I6[z, x, y]
-
-                    data_to_save1[index] = x
-                    data_to_save2[index] = y
-                    data_to_save3[index] = z
-                    data_to_save4[index] = I1px
-                    data_to_save5[index] = I2px
-                    data_to_save6[index] = I3px
-                    data_to_save7[index] = I4px
-                    data_to_save8[index] = I5px
-                    data_to_save9[index] = I6px
-
-                    index += 1
-
-    np.savetxt(filenames[0], data_to_save1[0:index], delimiter='\t')
-    np.savetxt(filenames[1], data_to_save2[0:index], delimiter='\t')
-    np.savetxt(filenames[2], data_to_save3[0:index], delimiter='\t')
-    np.savetxt(filenames[3], data_to_save4[0:index], delimiter='\t')
-    np.savetxt(filenames[4], data_to_save5[0:index], delimiter='\t')
-    np.savetxt(filenames[5], data_to_save6[0:index], delimiter='\t')
-    np.savetxt(filenames[6], data_to_save7[0:index], delimiter='\t')
-    np.savetxt(filenames[7], data_to_save8[0:index], delimiter='\t')
-    np.savetxt(filenames[8], data_to_save9[0:index], delimiter='\t')
-
 
 def hessian_matrix(x):
     x_grad = np.gradient(x)
@@ -1729,7 +1443,6 @@ def computeEigenvalueHessianMatrix(H):
     H_reshape = H.reshape(i, j, x * y * z)
     H_reshape = np.moveaxis(H_reshape, -1, 0)
     length = H_reshape.shape[0]
-    #Eig = np.apply_along_axis(LA.eigh,0,H_reshape.T)
 
 
     image_lambda_1 = np.zeros(H_reshape.shape[0])
@@ -1760,16 +1473,9 @@ def power_method(A, iterations):
     for _ in range(iterations):
         b_k1 = np.matmul(A, b_k)
         b_kn1 = np.dot(A[100],b_kn)
-        print('--------------')
-        print('Dot')
-        print(b_k1[100])
-        print(b_kn1)
         b_k = b_k1/(norm_vec(b_k1))
         b_kn = b_kn1/np.linalg.norm(b_kn1)
-        print('-------------')
-        print('Norm')
-        print(b_k[100])
-        print(b_kn)
+
 
 
 
@@ -1906,6 +1612,9 @@ def absolute_hessian_eigenvalues(nd_array, sigma=1, scale=True):
     :return: list of eigenvalues [eigenvalue1, eigenvalue2, ...]
     """
     return absolute_eigenvaluesh(compute_hessian_matrix(nd_array, sigma=sigma, scale=scale))
+
+
+
 if __name__ == "__main__":
 
     Image = np.random.rand(150,150,150)

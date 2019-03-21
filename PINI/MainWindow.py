@@ -295,23 +295,6 @@ class MyMainWindow(qt.QMainWindow) :
         rmAlphaAction.triggered.connect( self.mainWidget.remove_alpha_map)
         viewMenu.addAction(rmAlphaAction)
 
-
-        StudyMenu = menubar.addMenu('&Study')
-        venti_Action = qt.QAction('&Ventilation Map', self)
-        venti_Action.setStatusTip('Compute Ventilation Map')
-        venti_Action.triggered.connect(self.mainWidget.study_venti_GUI)
-        StudyMenu.addAction(venti_Action)
-
-        sVair_Action = qt.QAction('&Test sVair', self)
-        sVair_Action.setStatusTip('Test sVair')
-        sVair_Action.triggered.connect( self.mainWidget.sVair_GUI)
-        StudyMenu.addAction(sVair_Action)
-
-        density_Action = qt.QAction('&Density Change', self)
-        density_Action.setStatusTip('Compute Density Change')
-        density_Action.triggered.connect(self.mainWidget.study_density_GUI)
-        StudyMenu.addAction(density_Action)
-
 if __name__ == "__main__":
 
 
