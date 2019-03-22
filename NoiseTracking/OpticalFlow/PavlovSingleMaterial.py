@@ -284,6 +284,80 @@ def tomoPavlov(samplefilenames,referencename,outputFolder):
 
 
 
+def processOneImage(sampleImageName,referenceImageName,darkFileName=None,whiteFieldFileName=None):
+    # Constants
+    beta = 2.72809e-12
+    # beta=1.48E-15
+    # n=1-delta +i*beta
+    mu = 1.4805e0  # *30.
+
+    # mu=2*k*beta
+    # by a constant to produce a low frequency filter
+    # thickness_LFF_x30 - for mu *30
+    # thickness_LFF_x20 - for mu *20
+    # thickness_LFF_x10 - for mu *10
+    # thickness_LFF_x5 - for mu *5
+    delta = 1.04842e-7
+    # delta = 1.32e-7
+    # /39.4784176;
+    z1 = 0.9  # (m) distance for the msk to the object
+    z2 = 2.0  # (m) distance from the object to the detector
+    R1 = 42.  # (m) ~ distance from the source to the satellite building from ID17 website
+    R2 = 2.0  # (m) Propagation distance from the exit surface of the object
+    pix_size = 6.1e-6  # 6 um as in Paganin et al paper
+
+
+    Ir = openImage(referenceImageName)
+    Is = openImage(sampleImageName)
+    Ir = np.asarray(Ir, np.float32)
+    Is = np.asarray(Is, np.float32)
+
+    if darkFileName is not None:
+        df=openImage(darkFileName)
+        Is = (Is - df) / (Ir - df)
+        Is[np.isnan(Is)] = 0.0000000001
+        Ir= (Ir - df) / Ir
+        Is[np.isnan(Is)] = 0.0000000001
+
+
+    Image_old = np.true_divide(Is, Ir)
+    Image_old = 1 - Image_old
+
+    # New smaller array containing image of fibres only
+
+    # Copying a part of the larger array into the smaller array
+    # Image_new = Image_old[2:900,2:2000]
+    Image_new = Image_old
+
+    # Calculation of the average value of the image
+    average_image = np.mean(Image_new)
+    # Correction on the average image. Now the average of the new array is ~0
+    Image_new = Image_new - average_image
+    saveEdf(Image_new, 'ImageNew.edf')
+
+    # Using a modified TIE-HOM retrieval program from
+    # https://github.com/RSBradley/TomoTools/blob/master/addins/phase%20retrieval/tie_hom.m
+
+    img_in = Image_new
+
+    E = 52
+    low_frequency_filter = 1.
+    scale = 20.
+
+    # img_out = tie_hom_KMP2(img_in, E, R1, R2, pix_size, delta, beta*low_frequency_filter)
+    bg_val = 0
+
+    img_out = tie_hom_KMP2Last(img_in, E, R1, R2, pix_size, delta, beta * low_frequency_filter, bg_val, scale)
+    # img_out = tie_hom_KMP2_normalizexp(img_in, E, R1, R2, pix_size, delta, beta,sig_scale=0.9)
+    img_out = img_out * 1e6
+    # img_out[img_out<0]=0.000000000001
+
+    #saveEdf(img_out, '/Volumes/ID17/broncho/IHR_April2018/PavlovHA800Patte21_speckle01/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
+
+    return img_out
+
+
+
 def tomoPavlovMultiThreaded(samplefilenames,referencename,outputFolder,darkName,nbThread=4):
     numberOfProjections=len(samplefilenames)
     listofThreads = []
@@ -295,7 +369,9 @@ def tomoPavlovMultiThreaded(samplefilenames,referencename,outputFolder,darkName,
         else:
             listOfProjections = (np.arange(i * nbProjByThread, (i + 1) * nbProjByThread))
 
+        print(darkName)
         myThread = pavlovThread.PavlovOpticalFlowSolverThread(listOfProjections, samplefilenames,referencename,darkName,outputFolder)
+
         listofThreads.append(myThread)
 
     for i in range(nbThread):
@@ -327,15 +403,23 @@ def testOneImage():
     R2 = 2.0  # (m) Propagation distance from the exit surface of the object
     pix_size = 6.1e-6  # 6 um as in Paganin et al paper
 
-    numSlice='1318.edf'
+    numSlice='0000.edf'
 
     # Reading data
     Ir = openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf')
     Is = openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
     df=openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf')
 
-    Ir = np.asarray(Ir-df, np.float32)
-    Is = np.asarray(Is-df, np.float32)
+
+
+
+    Ir = np.asarray(Ir, np.float32)
+    Is = np.asarray(Is, np.float32)
+    Is = (Is - df) / (Ir - df)
+    Is[np.isnan(Is)] = 0.0000000001
+    Ir= (Ir - df) / Ir
+    Is[np.isnan(Is)] = 0.0000000001
+
 
     Image_old = np.true_divide(Is, Ir)
     Image_old = 1 - Image_old
@@ -376,12 +460,20 @@ def testOneImage():
 
 
 if __name__ == "__main__":
-    testOneImage()
+    #testOneImage()
+    irName='/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf'
+    isName='/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_0000.edf'
+    darkName='/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf'
+
+
+    result=processOneImage(isName,irName,darkName)
+    saveEdf(result, 'thickness.edf')
     outputtomofolder='/Volumes/ID17/broncho/IHR_April2018/PavlovHA800Patte21_speckle01/'
     inputFilenames=glob.glob('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800*.edf')
+    inputFilenames.sort()
     referenceFilename='/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf'
     darkFileName= '/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf'
-    tomoPavlovMultiThreaded(inputFilenames,referenceFilename,darkFileName,outputtomofolder)
+    tomoPavlovMultiThreaded(inputFilenames,referenceFilename,outputtomofolder,darkFileName)
 
 
 
