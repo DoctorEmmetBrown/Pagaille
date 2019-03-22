@@ -284,7 +284,7 @@ def tomoPavlov(samplefilenames,referencename,outputFolder):
 
 
 
-def tomoPavlovMultiThreaded(samplefilenames,referencename,outputFolder,nbThread=4):
+def tomoPavlovMultiThreaded(samplefilenames,referencename,outputFolder,darkName,nbThread=4):
     numberOfProjections=len(samplefilenames)
     listofThreads = []
     nbProjByThread = int(numberOfProjections / nbThread)
@@ -295,7 +295,7 @@ def tomoPavlovMultiThreaded(samplefilenames,referencename,outputFolder,nbThread=
         else:
             listOfProjections = (np.arange(i * nbProjByThread, (i + 1) * nbProjByThread))
 
-        myThread = pavlovThread.OpticalFlowSolverThread(listOfProjections, samplefilenames,referencename,outputFolder)
+        myThread = pavlovThread.PavlovOpticalFlowSolverThread(listOfProjections, samplefilenames,referencename,darkName,outputFolder)
         listofThreads.append(myThread)
 
     for i in range(nbThread):
@@ -330,9 +330,9 @@ def testOneImage():
     numSlice='1318.edf'
 
     # Reading data
-    Ir = openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf')
-    Is = openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
-    df=openImage('/samba/id17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf')
+    Ir = openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf')
+    Is = openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800_Patte21_3um_Gap90_75_Speckle01_'+numSlice)
+    df=openImage('/VOLUMES/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf')
 
     Ir = np.asarray(Ir-df, np.float32)
     Is = np.asarray(Is-df, np.float32)
@@ -350,7 +350,7 @@ def testOneImage():
     average_image = np.mean(Image_new)
     # Correction on the average image. Now the average of the new array is ~0
     Image_new = Image_new - average_image
-    saveEdf(Image_new, '/Users/embrun/PycharmProjects/souk/output/ImageNew.edf')
+    saveEdf(Image_new, 'ImageNew.edf')
 
     # Using a modified TIE-HOM retrieval program from
     # https://github.com/RSBradley/TomoTools/blob/master/addins/phase%20retrieval/tie_hom.m
@@ -377,10 +377,11 @@ def testOneImage():
 
 if __name__ == "__main__":
     testOneImage()
-#    outputtomofolder='/Volumes/ID17/broncho/IHR_April2018/PavlovHA800Patte21_speckle01/'
-#    inputFilenames=glob.glob('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800*.edf')
-#    referenceFilename='/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf'
-#    tomoPavlovMultiThreaded(inputFilenames,referenceFilename,outputtomofolder)
+    outputtomofolder='/Volumes/ID17/broncho/IHR_April2018/PavlovHA800Patte21_speckle01/'
+    inputFilenames=glob.glob('/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/HA800*.edf')
+    referenceFilename='/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/refHST0000.edf'
+    darkFileName= '/Volumes/ID17/broncho/IHR_April2018/HA800_Patte21_3um_Gap90_75_Speckle01_/dark.edf'
+    tomoPavlovMultiThreaded(inputFilenames,referenceFilename,darkFileName,outputtomofolder)
 
 
 

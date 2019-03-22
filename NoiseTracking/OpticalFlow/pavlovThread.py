@@ -7,13 +7,14 @@ import numpy as np
 
 
 
-class OpticalFlowSolverThread(Thread):
-    def __init__(self,listOfProjections,listOfSampleFileNames,referenceName,outputFolder):
+class PavlovOpticalFlowSolverThread(Thread):
+    def __init__(self,listOfProjections,listOfSampleFileNames,referenceName,darkn,outputFolder):
         Thread.__init__(self)
         self.referenceName = referenceName
         self.listOfProjection=listOfProjections
         self.output=outputFolder
         self.listOfSampleFileNames=listOfSampleFileNames
+        self.darkFileName=darkn
 
 
     def run(self):
@@ -42,7 +43,9 @@ class OpticalFlowSolverThread(Thread):
         scale = 20.
 
         Ir = openImage(self.referenceName)
-        Ir = np.asarray(Ir, np.float32)
+        df = openImage(self.self.darkFileName)
+        Ir = np.asarray(Ir-df, np.float32)
+
 
         projectionFiles = self.listOfSampleFileNames
         for numeroProjection in self.listOfProjection:
@@ -50,7 +53,7 @@ class OpticalFlowSolverThread(Thread):
             print('Processing ' + str(numeroProjection))
             projectionFileName=projectionFiles[numeroProjection]
             Is=openImage(projectionFileName)
-
+            Is=np.asarray(Is-df, np.float32)
             Image_old = np.true_divide(Is, Ir)
             Image_old = 1 - Image_old
             # New smaller array containing image of fibres only
